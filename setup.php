@@ -7,17 +7,13 @@ include "include/tools.php";
 <html lang="en">
 
 <head>
-
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
   <meta name="description" content="">
   <meta name="author" content="">
-
   <title>YSFReflector-Dashboard by DG9VH - Setup</title>
-
   <!-- Bootstrap core CSS -->
   <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
-
 </head>
 
 <body>
@@ -30,30 +26,29 @@ include "include/tools.php";
   </nav>
 
   <?php
-	if ($_GET['cmd'] =="writeconfig") {
-		if (!file_exists('./config')) {
-		    if (!mkdir('./config', 0777, true)) {
-  ?>
-  <div class="alert alert-danger" role="alert">You forgot to give write permissions to your webserver user!</div>
-
-  <?php
-		    }
-		}
-		$configfile = fopen("config/config.php", 'w');
-		fwrite($configfile,"<?php\n");
-		fwrite($configfile,"# This is an auto-generated config file!\n");
-		fwrite($configfile,"# Be careful, when manually editing this!\n\n");
-		fwrite($configfile,"date_default_timezone_set('UTC');\n");
-		fwrite($configfile, createConfigLines());
-		fwrite($configfile,"?>\n");
-		fclose($configfile);
-  ?>
-
-    <div class="alert alert-success" role="alert">Your config file is written in config/config.php, please remove setup.php for security reasons!</div>
-    <p><a href="index.php">Your dashboard is now available.</a></p>
-
-  <?php
-	} else {
+  if ($_GET['cmd'] == "writeconfig") {
+      if (!file_exists('./config')) {
+          if (!mkdir('./config', 0777, true)) {
+              echo '<div class="alert alert-danger" role="alert">You forgot to give write permissions to your webserver user!</div>';
+          } else {
+              echo '<div class="alert alert-success" role="alert">Config directory created!</div>';
+          }
+      }
+      $configfile = fopen("config/config.php", 'w');
+      if ($configfile) {
+          fwrite($configfile, "<?php\n");
+          fwrite($configfile, "# This is an auto-generated config file!\n");
+          fwrite($configfile, "# Be careful, when manually editing this!\n\n");
+          fwrite($configfile, "date_default_timezone_set('UTC');\n");
+          fwrite($configfile, createConfigLines());
+          fwrite($configfile, "?>\n");
+          fclose($configfile);
+          echo '<div class="alert alert-success" role="alert">Your config file is written in config/config.php, please remove setup.php for security reasons!</div>';
+          echo '<p><a href="index.php">Your dashboard is now available.</a></p>';
+      } else {
+          echo '<div class="alert alert-danger" role="alert">Failed to create config.php file!</div>';
+      }
+  } else {
   ?>
 
   <div class="container text-center">
@@ -103,7 +98,7 @@ include "include/tools.php";
     <div class="container">
       <div class="card">
         <div class="card-header">
-        <h2>Global Configuration</h2>
+          <h2>Global Configuration</h2>
         </div>
         <div class="card-body">
         <?php
@@ -125,7 +120,6 @@ include "include/tools.php";
               $structure = '';
                 foreach($zonen AS $zone) {
                 extract($zone);
-                //if($continent == 'Africa' || $continent == 'America' || $continent == 'Antarctica' || $continent == 'Arctic' || $continent == 'Asia' || $continent == 'Atlantic' || $continent == 'Australia' || $continent == 'Europe' || $continent == 'Indian' || $continent == 'Pacific') {
                 if(!isset($selectcontinent)) {
                   $structure .= '<optgroup label="'.$continent.'">'; // continent
                 } elseif($selectcontinent != $continent) {
@@ -147,7 +141,6 @@ include "include/tools.php";
                 $structure .= "<option ".(($continent==$selectedzone)?'selected="selected "':'')." value=\"".$continent."\">".$continent."</option>"; //Timezone
               }
               $selectcontinent = $continent;
-                // }
             }
             $structure .= '</optgroup>';
             return $structure;
@@ -165,52 +158,4 @@ include "include/tools.php";
           <input type="text" value="<?php echo constant("LOGO") ?>" name="LOGO" class="form-control" placeholder="http://your-logo" aria-describedby="LOGO">
         </div>
         <div class="input-group">
-          <span class="input-group-addon" id="REFRESHAFTER" style="width: 300px">Refresh page after in seconds</span>
-          <input type="text" value="<?php echo constant("REFRESHAFTER") ?>" name="REFRESHAFTER" class="form-control" placeholder="60" aria-describedby="REFRESHAFTER" required data-fv-notempty-message="Value is required">
-        </div>
-        <div class="input-group">
-          <span class="input-group-addon" id="SHOWPROGRESSBARS" style="width: 300px">Show progressbars</span>
-          <div class="panel-body"><input type="checkbox" <?php if (defined("SHOWPROGRESSBARS")) echo "checked" ?> name="SHOWPROGRESSBARS"></div>
-        </div>
-        <div class="input-group">
-          <span class="input-group-addon" id="SHOWOLDMHEARD" style="width: 300px">Show historic heard logs, in days</span>
-          <input type="text" value="<?php echo constant("SHOWOLDMHEARD") ?>" name="SHOWOLDMHEARD" class="form-control" placeholder="60" aria-describedby="SHOWOLDMHEARD" required data-fv-notempty-message="Value is required">
-        </div>
-        <div class="input-group">
-          <span class="input-group-addon" id="TEMPERATUREALERT" style="width: 300px">Enable CPU-temperature-warning</span>
-          <div class="panel-body"><input type="checkbox" <?php if (defined("TEMPERATUREALERT")) echo "checked" ?> name="TEMPERATUREALERT"></div>
-        </div>
-        <div class="input-group">
-          <span class="input-group-addon" id="TEMPERATUREHIGHLEVEL" style="width: 300px">Warning temperature</span>
-          <input type="text" value="<?php echo constant("TEMPERATUREHIGHLEVEL") ?>" name="TEMPERATUREHIGHLEVEL" class="form-control" placeholder="60" aria-describedby="TEMPERATUREHIGHLEVEL" required data-fv-notempty-message="Value is required">
-        </div>
-        <div class="input-group">
-          <span class="input-group-addon" id="SHOWQRZ" style="width: 300px">Show link to QRZ.com on Callsigns</span>
-          <div class="panel-body"><input type="checkbox" name="SHOWQRZ" <?php if (defined("SHOWQRZ")) echo "checked" ?>></div>
-        </div>
-        <div class="input-group">
-          <span class="input-group-addon" id="GDPR" style="width: 300px">Anonymize Callsigns (no function if QRZ.com enabled)</span>
-          <div class="panel-body"><input type="checkbox" name="GDPR" <?php if (defined("GDPR")) echo "checked" ?>></div>
-        </div>
-        <div class="input-group">
-        <span class="input-group-btn">
-          <button class="btn btn-primary" type="submit" form="config">Save configuration</button>
-        </span>
-        </div>
-      </div>
-      </div>
-    </div>
-  </form>
-
-<?php
-	}
-?>
-
-  <!-- Bootstrap core JavaScript -->
-  <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script>
-  <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
-
-</body>
-
-</html>
+          <span class="input-group-addon" id="REFRESHAFTER" style="width: 300px">
